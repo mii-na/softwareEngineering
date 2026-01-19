@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 
-// --- データ型定義（学籍番号 studentId を追加） ---
+// --- データ型定義 ---
 interface ParcelData {
   id: string;
-  studentId: string; // 新規追加
+  studentId: string;
   studentName: string;
   type: '荷物' | '郵便';
   deliveryDate: string;
@@ -39,12 +39,12 @@ const EditIcon = () => (
 const EditPage: React.FC = () => {
   const navigate = useNavigate();
   
-  // データ一覧の状態
   const [items, setItems] = useState<ParcelData[]>(mockData);
-
-  // モーダル関連の状態
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ParcelData | null>(null);
+
+  // 今日の日付を YYYY-MM-DD 形式で取得するヘルパー関数
+  const getTodayDate = () => new Date().toISOString().split('T')[0];
 
   // 削除処理
   const handleDelete = (id: string) => {
@@ -53,9 +53,24 @@ const EditPage: React.FC = () => {
     }
   };
 
-  // 編集ボタンクリック（モーダルを開く）
+  // 編集ボタンクリック（既存データをセットしてモーダルを開く）
   const handleEditClick = (item: ParcelData) => {
-    setEditingItem({ ...item }); // データをコピーしてセット
+    setEditingItem({ ...item });
+    setIsModalOpen(true);
+  };
+
+  // 追加ボタンクリック（空のデータをセットしてモーダルを開く）
+  const handleAddClick = () => {
+    // 新規登録用の空データを作成（IDは空文字にしておく）
+    const newItem: ParcelData = {
+      id: '', 
+      studentId: '',
+      studentName: '',
+      type: '荷物',
+      deliveryDate: getTodayDate(), // デフォルトで今日の日付
+      elapsedDays: 0
+    };
+    setEditingItem(newItem);
     setIsModalOpen(true);
   };
 
@@ -66,16 +81,26 @@ const EditPage: React.FC = () => {
     }
   };
 
-  // 「登録」ボタンクリック（データ更新）
-  const handleUpdate = () => {
+  // 「登録」ボタンクリック（新規追加 or 更新）
+  const handleSave = () => {
     if (!editingItem) return;
 
-    // items配列の中身を更新
-    const updatedItems = items.map((item) => 
-      item.id === editingItem.id ? editingItem : item
-    );
+    if (editingItem.id === '') {
+      // --- 新規追加の場合 ---
+      // ユニークなIDを生成（簡易的に現在時刻を使用）
+      const newId = Date.now().toString();
+      const newItem = { ...editingItem, id: newId };
+      // 配列の末尾に追加
+      setItems([...items, newItem]);
+    } else {
+      // --- 既存更新の場合 ---
+      // IDが一致するものを更新
+      const updatedItems = items.map((item) => 
+        item.id === editingItem.id ? editingItem : item
+      );
+      setItems(updatedItems);
+    }
     
-    setItems(updatedItems);
     setIsModalOpen(false); // モーダルを閉じる
   };
 
@@ -128,17 +153,26 @@ const EditPage: React.FC = () => {
           </table>
         </div>
 
+        {/* --- ここが新しい「追加ボタン」エリア --- */}
+        <div className="add-button-container">
+          <button className="add-button" onClick={handleAddClick}>
+            ＋ 追加
+          </button>
+        </div>
+
+        {/* 戻りボタンエリア */}
         <div className="button-container">
           <button className="action-button" onClick={() => navigate('/')}>戻り</button>
         </div>
       </main>
 
-      {/* --- モーダル（ポップアップ） --- */}
+      {/* --- モーダル --- */}
       {isModalOpen && editingItem && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          {/* onClick.stopPropagation() でモーダル内部クリック時に閉じないようにする */}
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">荷物登録</h2>
+            <h2 className="modal-title">
+              {editingItem.id === '' ? '荷物登録（新規）' : '荷物登録（編集）'}
+            </h2>
             
             <div className="form-group">
               <label className="form-label">学籍番号</label>
@@ -147,6 +181,7 @@ const EditPage: React.FC = () => {
                 className="form-input"
                 value={editingItem.studentId}
                 onChange={(e) => handleInputChange('studentId', e.target.value)}
+                placeholder="例: 2025005"
               />
             </div>
 
@@ -157,6 +192,7 @@ const EditPage: React.FC = () => {
                 className="form-input"
                 value={editingItem.studentName}
                 onChange={(e) => handleInputChange('studentName', e.target.value)}
+                placeholder="例: 学生E"
               />
             </div>
 
@@ -175,7 +211,7 @@ const EditPage: React.FC = () => {
             <div className="form-group">
               <label className="form-label">配達日</label>
               <input 
-                type="date" // 日付入力フォーム
+                type="date"
                 className="form-input"
                 value={editingItem.deliveryDate}
                 onChange={(e) => handleInputChange('deliveryDate', e.target.value)}
@@ -183,7 +219,7 @@ const EditPage: React.FC = () => {
             </div>
 
             <div className="modal-actions">
-              <button className="save-button" onClick={handleUpdate}>
+              <button className="save-button" onClick={handleSave}>
                 登録
               </button>
             </div>
