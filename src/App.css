@@ -385,3 +385,10 @@ body {
 .detail-info p {
   margin: 5px 0;
 }
+
+/* --- Home画面のボタン配置（右寄せ） --- */
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* 右端に寄せる */
+  margin-top: 32px;
+}

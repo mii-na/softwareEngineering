@@ -1,24 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 
-// --- データ型定義 ---
-interface ParcelData {
+
+// --- データ型定義 (Homeと合わせる) ---
+// Home.tsxのParcelDataと同じ構造にします
+interface ParcelDataCommon {
   id: string;
-  studentId: string;
+  studentId?: string;
   studentName: string;
   type: '荷物' | '郵便';
+  count: number;
   deliveryDate: string;
   elapsedDays: number;
 }
-
-// 初期データ
-const mockData: ParcelData[] = [
-  { id: '1', studentId: '2025001', studentName: '学生A', type: '荷物', deliveryDate: '2025-12-15', elapsedDays: 7 },
-  { id: '2', studentId: '2025002', studentName: '学生B', type: '荷物', deliveryDate: '2025-12-20', elapsedDays: 2 },
-  { id: '3', studentId: '2025003', studentName: '学生C', type: '荷物', deliveryDate: '2025-12-22', elapsedDays: 0 },
-  { id: '4', studentId: '2025004', studentName: '学生Δ', type: '郵便', deliveryDate: '2025-12-22', elapsedDays: 0 },
-];
 
 // --- アイコン ---
 const TrashIcon = () => (
@@ -35,33 +30,51 @@ const EditIcon = () => (
   </svg>
 );
 
-// --- メインコンポーネント ---
 const EditPage: React.FC = () => {
   const navigate = useNavigate();
   
-  const [items, setItems] = useState<ParcelData[]>(mockData);
+  const [items, setItems] = useState<ParcelDataCommon[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<ParcelData | null>(null);
+  const [editingItem, setEditingItem] = useState<ParcelDataCommon | null>(null);
 
   const getTodayDate = () => new Date().toISOString().split('T')[0];
 
+  // --- 初回読み込み ---
+  useEffect(() => {
+    const savedData = localStorage.getItem('parcelData');
+    if (savedData) {
+      setItems(JSON.parse(savedData));
+    } else {
+      // Homeで初期化されているはずだが念のため
+      setItems([]); 
+    }
+  }, []);
+
+  // --- データを保存する関数 ---
+  const saveItems = (newItems: ParcelDataCommon[]) => {
+    setItems(newItems);
+    localStorage.setItem('parcelData', JSON.stringify(newItems));
+  };
+
   const handleDelete = (id: string) => {
     if (window.confirm('削除しますか？')) {
-      setItems(items.filter((item) => item.id !== id));
+      const newItems = items.filter((item) => item.id !== id);
+      saveItems(newItems); // 保存
     }
   };
 
-  const handleEditClick = (item: ParcelData) => {
+  const handleEditClick = (item: ParcelDataCommon) => {
     setEditingItem({ ...item });
     setIsModalOpen(true);
   };
 
   const handleAddClick = () => {
-    const newItem: ParcelData = {
+    const newItem: ParcelDataCommon = {
       id: '', 
       studentId: '',
       studentName: '',
       type: '荷物',
+      count: 1, // デフォルト個数
       deliveryDate: getTodayDate(),
       elapsedDays: 0
     };
@@ -69,7 +82,7 @@ const EditPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleInputChange = (field: keyof ParcelData, value: string) => {
+  const handleInputChange = (field: keyof ParcelDataCommon, value: string | number) => {
     if (editingItem) {
       setEditingItem({ ...editingItem, [field]: value });
     }
@@ -78,17 +91,21 @@ const EditPage: React.FC = () => {
   const handleSave = () => {
     if (!editingItem) return;
 
+    let newItems = [...items];
+
     if (editingItem.id === '') {
+      // 新規追加
       const newId = Date.now().toString();
       const newItem = { ...editingItem, id: newId };
-      setItems([...items, newItem]);
+      newItems.push(newItem);
     } else {
-      const updatedItems = items.map((item) => 
+      // 更新
+      newItems = newItems.map((item) => 
         item.id === editingItem.id ? editingItem : item
       );
-      setItems(updatedItems);
     }
     
+    saveItems(newItems); // 保存して反映
     setIsModalOpen(false);
   };
 
@@ -141,14 +158,13 @@ const EditPage: React.FC = () => {
           </table>
         </div>
 
-        {/* --- 変更点：ボタンを一つの行にまとめる --- */}
         <div className="button-row">
           <button className="action-button" onClick={handleAddClick}>
             追加
           </button>
           
           <button className="action-button" onClick={() => navigate('/')}>
-            戻る
+            戻り
           </button>
         </div>
 
@@ -167,7 +183,7 @@ const EditPage: React.FC = () => {
               <input 
                 type="text" 
                 className="form-input"
-                value={editingItem.studentId}
+                value={editingItem.studentId || ''}
                 onChange={(e) => handleInputChange('studentId', e.target.value)}
                 placeholder="例: 2025005"
               />
@@ -195,6 +211,8 @@ const EditPage: React.FC = () => {
                 <option value="郵便">郵便</option>
               </select>
             </div>
+            
+            {/* 個数編集が必要な場合はここに追加できますが、今回は指定がなかったため省略 */}
 
             <div className="form-group">
               <label className="form-label">配達日</label>
