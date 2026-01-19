@@ -18,7 +18,7 @@ body {
 
 /* --- ヘッダー --- */
 .app-header {
-  background-color: #4A86E8; /* 画像の特徴的な青色 */
+  background-color: #4A86E8;
   color: white;
   padding: 16px 24px;
   display: flex;
@@ -30,22 +30,16 @@ body {
 .header-title {
   font-size: 1.25rem;
   font-weight: bold;
-  letter-spacing: 0.05em;
 }
 
 .header-history {
-  font-size: 1rem;
   cursor: pointer;
-}
-
-.header-history:hover {
-  text-decoration: underline;
 }
 
 /* --- メインコンテンツ --- */
 .main-content {
   max-width: 1024px;
-  margin: 0 auto; /* 中央寄せ */
+  margin: 0 auto;
   padding: 40px 24px;
   width: 100%;
 }
@@ -54,87 +48,95 @@ body {
   font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 40px;
-  color: black;
 }
 
-/* --- テーブル --- */
+/* --- テーブル設定 (ここから下が特に重要) --- */
 .table-container {
   width: 100%;
-  border: 1px solid #666; /* 外枠 */
 }
 
 .parcel-table {
   width: 100%;
-  border-collapse: collapse; /* Excelのように隙間をなくす */
-  table-layout: fixed; /* 列幅を固定して制御しやすくする */
+  border-collapse: collapse;
+  /* 列幅を固定してレイアウト崩れを防ぐ */
+  table-layout: fixed; 
 }
 
-/* テーブルヘッダー */
+/* --- テーブルヘッダー --- */
 .parcel-table th {
-  background-color: #4A86E8;
-  color: white;
   padding: 16px;
-  border-right: 1px solid #666; /* 縦の区切り線 */
   font-weight: 600;
   text-align: center;
+  /* デフォルトの境界線 */
+  border-right: 1px solid #666;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+  background-color: #4A86E8;
+  color: white;
 }
 
-.parcel-table th:last-child {
-  border-right: none;
+/* --- ！！！ここが重なり解消の重要ポイント！！！ --- */
+/* アイコン用のヘッダー（透明・幅固定） */
+.th-icon-header {
+  width: 60px;  /* ここで幅を確保しています */
+  background-color: transparent !important; /* 青背景を消す */
+  border: none !important; /* 枠線を消す */
 }
 
-/* 列幅の指定 */
-.th-name { width: 45%; }
+/* --- 列の幅設定 --- */
+/* アイコン列以外の幅をパーセントで指定 */
+.th-name { width: 40%; border-left: 1px solid #666; }
 .th-type { width: 15%; }
 .th-date { width: 25%; }
-.th-days { width: 15%; }
+.th-days { width: 10%; }
 
-/* テーブルボディ */
+/* --- テーブルボディ --- */
 .parcel-table td {
-  padding: 16px;
-  border-top: 1px solid #666; /* 横の区切り線 */
-  border-right: 1px solid #666; /* 縦の区切り線 */
-  font-size: 1.1rem;
+  padding: 12px;
+  border: 1px solid #666;
+  vertical-align: middle;
+  height: 60px; /* セルの高さを確保 */
 }
 
-.parcel-table td:last-child {
-  border-right: none;
-}
-
-/* 学生名は左寄せ、その他は中央寄せ */
-.td-name {
-  text-align: left;
-  padding-left: 24px; /* 学生名のインデント */
-}
-
-.td-center {
+/* アイコン用セル */
+.td-icon {
+  width: 60px; /* ヘッダーと同じ幅を指定 */
   text-align: center;
+  padding: 0; /* パディングをなくして中央配置しやすくする */
+  border: none; /* アイコン周りの枠線はお好みで（画像に合わせるなら枠なしが良いかも） */
 }
 
-/* 空行のスタイル（高さ確保） */
-.empty-row td {
-  height: 60px;
+/* もし画像のようにアイコンにも枠線が必要なら以下を有効にしてください */
+/* .td-icon { border: 1px solid #666; } */
+
+.icon-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
-/* --- ボタンエリア --- */
+.td-name { text-align: left; padding-left: 24px; }
+.td-center { text-align: center; }
+
+/* 空行 */
+.empty-row td { height: 60px; }
+.td-icon-empty { border: none !important; }
+
+/* --- ボタン --- */
 .button-container {
   display: flex;
-  justify-content: flex-end; /* 右寄せ */
+  justify-content: flex-end;
   margin-top: 32px;
 }
 
-.edit-button {
+.action-button {
   background-color: #4A86E8;
   color: white;
   font-size: 1.5rem;
   padding: 10px 50px;
   border: none;
-  border-radius: 8px; /* 角丸 */
+  border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: background-color 0.2s;
-}
-
-.edit-button:hover {
-  background-color: #3b75d6;
 }

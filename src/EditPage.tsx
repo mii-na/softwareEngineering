@@ -1,9 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
-import { mockData } from './Home'; // データをHomeからインポート（または共通ファイルから）
 
-// アイコンコンポーネント
+// --- 方法②：ここで型とデータを定義します ---
+
+interface ParcelData {
+  id: string;
+  studentName: string;
+  type: '荷物' | '郵便';
+  deliveryDate: string;
+  elapsedDays: number;
+}
+
+const mockData: ParcelData[] = [
+  { id: '1', studentName: '学生A', type: '荷物', deliveryDate: '2025/12/15', elapsedDays: 7 },
+  { id: '2', studentName: '学生B', type: '荷物', deliveryDate: '2025/12/20', elapsedDays: 2 },
+  { id: '3', studentName: '学生C', type: '荷物', deliveryDate: '2025/12/22', elapsedDays: 0 },
+  { id: '4', studentName: '学生Δ', type: '郵便', deliveryDate: '2025/12/22', elapsedDays: 0 },
+];
+
+// --- アイコンの定義 ---
+
 const TrashIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#E25C5C" width="32px" height="32px">
     <path d="M0 0h24v24H0V0z" fill="none"/>
@@ -18,8 +35,23 @@ const EditIcon = () => (
   </svg>
 );
 
+// --- メインコンポーネント ---
+
 const EditPage: React.FC = () => {
   const navigate = useNavigate();
+  
+  // データを状態(items)として管理
+  const [items, setItems] = useState<ParcelData[]>(mockData);
+
+  // 削除処理
+  const handleDelete = (id: string) => {
+    const isConfirmed = window.confirm('削除しますか？');
+    if (isConfirmed) {
+      // IDが一致しないものだけを残す（＝一致するものを削除）
+      const newItems = items.filter((item) => item.id !== id);
+      setItems(newItems);
+    }
+  };
 
   return (
     <div className="app-container">
@@ -35,8 +67,10 @@ const EditPage: React.FC = () => {
           <table className="parcel-table">
             <thead>
               <tr>
+                {/* ヘッダー：アイコン用に空の列を2つ用意 */}
                 <th className="th-icon-header"></th>
                 <th className="th-icon-header"></th>
+                
                 <th className="th-name">学生名</th>
                 <th className="th-type">種類</th>
                 <th className="th-date">配達日</th>
@@ -44,16 +78,37 @@ const EditPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {mockData.map((item) => (
+              {/* 重要：mockDataではなくitemsをマップする */}
+              {items.map((item) => (
                 <tr key={item.id}>
-                  <td className="td-icon"><div className="icon-box"><TrashIcon /></div></td>
-                  <td className="td-icon"><div className="icon-box"><EditIcon /></div></td>
+                  
+                  {/* 1列目：ゴミ箱アイコン */}
+                  <td className="td-icon">
+                    <div 
+                      className="icon-box" 
+                      onClick={() => handleDelete(item.id)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <TrashIcon />
+                    </div>
+                  </td>
+
+                  {/* 2列目：編集アイコン（別のtdタグにする） */}
+                  <td className="td-icon">
+                    <div className="icon-box" style={{ cursor: 'pointer' }}>
+                      <EditIcon />
+                    </div>
+                  </td>
+
+                  {/* データ列 */}
                   <td className="td-name">{item.studentName}</td>
                   <td className="td-center">{item.type}</td>
                   <td className="td-center">{item.deliveryDate}</td>
                   <td className="td-center">{item.elapsedDays}</td>
                 </tr>
               ))}
+              
+              {/* レイアウト調整用の空行 */}
               <tr className="empty-row">
                  <td className="td-icon-empty"></td>
                  <td className="td-icon-empty"></td>
@@ -64,7 +119,6 @@ const EditPage: React.FC = () => {
         </div>
 
         <div className="button-container">
-          {/* クリックしたらトップページ / へ戻る */}
           <button className="action-button" onClick={() => navigate('/')}>
             戻り
           </button>
