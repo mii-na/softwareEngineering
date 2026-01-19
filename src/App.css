@@ -1,3 +1,140 @@
-h1 {
-  color: blue;
+/* 全体のリセットとフォント設定 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: white;
+  color: #333;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- ヘッダー --- */
+.app-header {
+  background-color: #4A86E8; /* 画像の特徴的な青色 */
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.header-history {
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.header-history:hover {
+  text-decoration: underline;
+}
+
+/* --- メインコンテンツ --- */
+.main-content {
+  max-width: 1024px;
+  margin: 0 auto; /* 中央寄せ */
+  padding: 40px 24px;
+  width: 100%;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 40px;
+  color: black;
+}
+
+/* --- テーブル --- */
+.table-container {
+  width: 100%;
+  border: 1px solid #666; /* 外枠 */
+}
+
+.parcel-table {
+  width: 100%;
+  border-collapse: collapse; /* Excelのように隙間をなくす */
+  table-layout: fixed; /* 列幅を固定して制御しやすくする */
+}
+
+/* テーブルヘッダー */
+.parcel-table th {
+  background-color: #4A86E8;
+  color: white;
+  padding: 16px;
+  border-right: 1px solid #666; /* 縦の区切り線 */
+  font-weight: 600;
+  text-align: center;
+}
+
+.parcel-table th:last-child {
+  border-right: none;
+}
+
+/* 列幅の指定 */
+.th-name { width: 45%; }
+.th-type { width: 15%; }
+.th-date { width: 25%; }
+.th-days { width: 15%; }
+
+/* テーブルボディ */
+.parcel-table td {
+  padding: 16px;
+  border-top: 1px solid #666; /* 横の区切り線 */
+  border-right: 1px solid #666; /* 縦の区切り線 */
+  font-size: 1.1rem;
+}
+
+.parcel-table td:last-child {
+  border-right: none;
+}
+
+/* 学生名は左寄せ、その他は中央寄せ */
+.td-name {
+  text-align: left;
+  padding-left: 24px; /* 学生名のインデント */
+}
+
+.td-center {
+  text-align: center;
+}
+
+/* 空行のスタイル（高さ確保） */
+.empty-row td {
+  height: 60px;
+}
+
+/* --- ボタンエリア --- */
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* 右寄せ */
+  margin-top: 32px;
+}
+
+.edit-button {
+  background-color: #4A86E8;
+  color: white;
+  font-size: 1.5rem;
+  padding: 10px 50px;
+  border: none;
+  border-radius: 8px; /* 角丸 */
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background-color 0.2s;
+}
+
+.edit-button:hover {
+  background-color: #3b75d6;
 }
