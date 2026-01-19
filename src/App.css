@@ -125,11 +125,49 @@ body {
 .td-icon-empty { border: none !important; }
 
 /* --- ボタン --- */
-.button-container {
+/* --- ボタンエリアのレイアウト --- */
+/* 追加ボタンと戻りボタンを同じ行に、左右に分けて配置 */
+.button-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between; /* 左端と右端にスペースを空けて配置 */
+  align-items: center;
   margin-top: 32px;
+  width: 100%;
 }
+
+/* 共通のボタンデザイン（以前定義済みならそのままでOK） */
+.action-button {
+  background-color: #4A86E8;
+  color: white;
+  font-size: 1.5rem;
+  padding: 10px 50px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background-color 0.2s;
+  text-align: center;
+  min-width: 160px;
+}
+
+.action-button:hover {
+  background-color: #3b75d6;
+}
+
+/* --- 以下、モーダル（ポップアップ）用のスタイル（変更なし） --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+/* ... 以降のモーダルスタイルはそのまま維持 ... */
 
 .action-button {
   background-color: #4A86E8;
@@ -198,6 +236,84 @@ body {
 }
 
 /* 登録ボタンエリア */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.save-button {
+  background-color: #4A86E8;
+  color: white;
+  font-size: 1.2rem;
+  padding: 10px 60px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  background-color: #3b75d6;
+}
+
+
+
+/* .add-button のスタイル定義は削除しました。
+  代わりに共通の .action-button クラスを使用します。
+*/
+
+/* --- 以下、モーダル（ポップアップ）用のスタイル --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.modal-title {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.form-label {
+  width: 120px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.form-input, .form-select {
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
 .modal-actions {
   display: flex;
   justify-content: center;

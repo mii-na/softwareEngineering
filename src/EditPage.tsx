@@ -43,65 +43,53 @@ const EditPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ParcelData | null>(null);
 
-  // 今日の日付を YYYY-MM-DD 形式で取得するヘルパー関数
   const getTodayDate = () => new Date().toISOString().split('T')[0];
 
-  // 削除処理
   const handleDelete = (id: string) => {
     if (window.confirm('削除しますか？')) {
       setItems(items.filter((item) => item.id !== id));
     }
   };
 
-  // 編集ボタンクリック（既存データをセットしてモーダルを開く）
   const handleEditClick = (item: ParcelData) => {
     setEditingItem({ ...item });
     setIsModalOpen(true);
   };
 
-  // 追加ボタンクリック（空のデータをセットしてモーダルを開く）
   const handleAddClick = () => {
-    // 新規登録用の空データを作成（IDは空文字にしておく）
     const newItem: ParcelData = {
       id: '', 
       studentId: '',
       studentName: '',
       type: '荷物',
-      deliveryDate: getTodayDate(), // デフォルトで今日の日付
+      deliveryDate: getTodayDate(),
       elapsedDays: 0
     };
     setEditingItem(newItem);
     setIsModalOpen(true);
   };
 
-  // フォーム入力時の更新処理
   const handleInputChange = (field: keyof ParcelData, value: string) => {
     if (editingItem) {
       setEditingItem({ ...editingItem, [field]: value });
     }
   };
 
-  // 「登録」ボタンクリック（新規追加 or 更新）
   const handleSave = () => {
     if (!editingItem) return;
 
     if (editingItem.id === '') {
-      // --- 新規追加の場合 ---
-      // ユニークなIDを生成（簡易的に現在時刻を使用）
       const newId = Date.now().toString();
       const newItem = { ...editingItem, id: newId };
-      // 配列の末尾に追加
       setItems([...items, newItem]);
     } else {
-      // --- 既存更新の場合 ---
-      // IDが一致するものを更新
       const updatedItems = items.map((item) => 
         item.id === editingItem.id ? editingItem : item
       );
       setItems(updatedItems);
     }
     
-    setIsModalOpen(false); // モーダルを閉じる
+    setIsModalOpen(false);
   };
 
   return (
@@ -153,17 +141,17 @@ const EditPage: React.FC = () => {
           </table>
         </div>
 
-        {/* --- ここが新しい「追加ボタン」エリア --- */}
-        <div className="add-button-container">
-          <button className="add-button" onClick={handleAddClick}>
-            ＋ 追加
+        {/* --- 変更点：ボタンを一つの行にまとめる --- */}
+        <div className="button-row">
+          <button className="action-button" onClick={handleAddClick}>
+            追加
+          </button>
+          
+          <button className="action-button" onClick={() => navigate('/')}>
+            戻り
           </button>
         </div>
 
-        {/* 戻りボタンエリア */}
-        <div className="button-container">
-          <button className="action-button" onClick={() => navigate('/')}>戻り</button>
-        </div>
       </main>
 
       {/* --- モーダル --- */}
@@ -171,7 +159,7 @@ const EditPage: React.FC = () => {
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2 className="modal-title">
-              {editingItem.id === '' ? '荷物登録（新規）' : '荷物登録（編集）'}
+              {editingItem.id === '' ? '荷物登録' : '荷物登録'}
             </h2>
             
             <div className="form-group">
