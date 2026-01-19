@@ -2,25 +2,25 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 
-// --- 方法②：ここで型とデータを定義します ---
-
+// --- データ型定義（学籍番号 studentId を追加） ---
 interface ParcelData {
   id: string;
+  studentId: string; // 新規追加
   studentName: string;
   type: '荷物' | '郵便';
   deliveryDate: string;
   elapsedDays: number;
 }
 
+// 初期データ
 const mockData: ParcelData[] = [
-  { id: '1', studentName: '学生A', type: '荷物', deliveryDate: '2025/12/15', elapsedDays: 7 },
-  { id: '2', studentName: '学生B', type: '荷物', deliveryDate: '2025/12/20', elapsedDays: 2 },
-  { id: '3', studentName: '学生C', type: '荷物', deliveryDate: '2025/12/22', elapsedDays: 0 },
-  { id: '4', studentName: '学生Δ', type: '郵便', deliveryDate: '2025/12/22', elapsedDays: 0 },
+  { id: '1', studentId: '2025001', studentName: '学生A', type: '荷物', deliveryDate: '2025-12-15', elapsedDays: 7 },
+  { id: '2', studentId: '2025002', studentName: '学生B', type: '荷物', deliveryDate: '2025-12-20', elapsedDays: 2 },
+  { id: '3', studentId: '2025003', studentName: '学生C', type: '荷物', deliveryDate: '2025-12-22', elapsedDays: 0 },
+  { id: '4', studentId: '2025004', studentName: '学生Δ', type: '郵便', deliveryDate: '2025-12-22', elapsedDays: 0 },
 ];
 
-// --- アイコンの定義 ---
-
+// --- アイコン ---
 const TrashIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#E25C5C" width="32px" height="32px">
     <path d="M0 0h24v24H0V0z" fill="none"/>
@@ -36,21 +36,47 @@ const EditIcon = () => (
 );
 
 // --- メインコンポーネント ---
-
 const EditPage: React.FC = () => {
   const navigate = useNavigate();
   
-  // データを状態(items)として管理
+  // データ一覧の状態
   const [items, setItems] = useState<ParcelData[]>(mockData);
+
+  // モーダル関連の状態
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<ParcelData | null>(null);
 
   // 削除処理
   const handleDelete = (id: string) => {
-    const isConfirmed = window.confirm('削除しますか？');
-    if (isConfirmed) {
-      // IDが一致しないものだけを残す（＝一致するものを削除）
-      const newItems = items.filter((item) => item.id !== id);
-      setItems(newItems);
+    if (window.confirm('削除しますか？')) {
+      setItems(items.filter((item) => item.id !== id));
     }
+  };
+
+  // 編集ボタンクリック（モーダルを開く）
+  const handleEditClick = (item: ParcelData) => {
+    setEditingItem({ ...item }); // データをコピーしてセット
+    setIsModalOpen(true);
+  };
+
+  // フォーム入力時の更新処理
+  const handleInputChange = (field: keyof ParcelData, value: string) => {
+    if (editingItem) {
+      setEditingItem({ ...editingItem, [field]: value });
+    }
+  };
+
+  // 「登録」ボタンクリック（データ更新）
+  const handleUpdate = () => {
+    if (!editingItem) return;
+
+    // items配列の中身を更新
+    const updatedItems = items.map((item) => 
+      item.id === editingItem.id ? editingItem : item
+    );
+    
+    setItems(updatedItems);
+    setIsModalOpen(false); // モーダルを閉じる
   };
 
   return (
@@ -67,10 +93,8 @@ const EditPage: React.FC = () => {
           <table className="parcel-table">
             <thead>
               <tr>
-                {/* ヘッダー：アイコン用に空の列を2つ用意 */}
                 <th className="th-icon-header"></th>
                 <th className="th-icon-header"></th>
-                
                 <th className="th-name">学生名</th>
                 <th className="th-type">種類</th>
                 <th className="th-date">配達日</th>
@@ -78,40 +102,26 @@ const EditPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {/* 重要：mockDataではなくitemsをマップする */}
               {items.map((item) => (
                 <tr key={item.id}>
-                  
-                  {/* 1列目：ゴミ箱アイコン */}
                   <td className="td-icon">
-                    <div 
-                      className="icon-box" 
-                      onClick={() => handleDelete(item.id)}
-                      style={{ cursor: 'pointer' }}
-                    >
+                    <div className="icon-box" onClick={() => handleDelete(item.id)} style={{ cursor: 'pointer' }}>
                       <TrashIcon />
                     </div>
                   </td>
-
-                  {/* 2列目：編集アイコン（別のtdタグにする） */}
                   <td className="td-icon">
-                    <div className="icon-box" style={{ cursor: 'pointer' }}>
+                    <div className="icon-box" onClick={() => handleEditClick(item)} style={{ cursor: 'pointer' }}>
                       <EditIcon />
                     </div>
                   </td>
-
-                  {/* データ列 */}
                   <td className="td-name">{item.studentName}</td>
                   <td className="td-center">{item.type}</td>
                   <td className="td-center">{item.deliveryDate}</td>
                   <td className="td-center">{item.elapsedDays}</td>
                 </tr>
               ))}
-              
-              {/* レイアウト調整用の空行 */}
               <tr className="empty-row">
-                 <td className="td-icon-empty"></td>
-                 <td className="td-icon-empty"></td>
+                 <td className="td-icon-empty"></td><td className="td-icon-empty"></td>
                  <td></td><td></td><td></td><td></td>
               </tr>
             </tbody>
@@ -119,11 +129,68 @@ const EditPage: React.FC = () => {
         </div>
 
         <div className="button-container">
-          <button className="action-button" onClick={() => navigate('/')}>
-            戻り
-          </button>
+          <button className="action-button" onClick={() => navigate('/')}>戻り</button>
         </div>
       </main>
+
+      {/* --- モーダル（ポップアップ） --- */}
+      {isModalOpen && editingItem && (
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          {/* onClick.stopPropagation() でモーダル内部クリック時に閉じないようにする */}
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">荷物登録</h2>
+            
+            <div className="form-group">
+              <label className="form-label">学籍番号</label>
+              <input 
+                type="text" 
+                className="form-input"
+                value={editingItem.studentId}
+                onChange={(e) => handleInputChange('studentId', e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">学生名</label>
+              <input 
+                type="text" 
+                className="form-input"
+                value={editingItem.studentName}
+                onChange={(e) => handleInputChange('studentName', e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">種類</label>
+              <select 
+                className="form-select"
+                value={editingItem.type}
+                onChange={(e) => handleInputChange('type', e.target.value)}
+              >
+                <option value="荷物">荷物</option>
+                <option value="郵便">郵便</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">配達日</label>
+              <input 
+                type="date" // 日付入力フォーム
+                className="form-input"
+                value={editingItem.deliveryDate}
+                onChange={(e) => handleInputChange('deliveryDate', e.target.value)}
+              />
+            </div>
+
+            <div className="modal-actions">
+              <button className="save-button" onClick={handleUpdate}>
+                登録
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 };
