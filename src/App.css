@@ -333,3 +333,55 @@ body {
 .save-button:hover {
   background-color: #3b75d6;
 }
+
+/* --- Home画面用: 行のホバー効果 --- */
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable-row:hover {
+  background-color: #fff9c4; /* 画像のような薄い黄色でハイライト */
+}
+
+/* --- ヘッダーのメニューリンク --- */
+.header-menu {
+  display: flex;
+  gap: 20px;
+}
+.header-link {
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* --- 詳細モーダル特有のスタイル --- */
+
+/* モーダルのサイズ調整（詳細画面用） */
+.detail-modal {
+  text-align: center; /* 全体を中央寄せ */
+  padding: 50px 40px;
+  width: 500px;
+}
+
+/* 学生名（大見出し） */
+.detail-title {
+  font-size: 3rem; /* 画像のようにかなり大きく */
+  font-weight: 500;
+  margin-bottom: 30px;
+  color: #000;
+}
+
+/* 詳細情報のテキストブロック */
+.detail-info {
+  text-align: left; /* テキスト自体は左揃え */
+  display: inline-block; /* ブロック全体を中央に配置するためにインラインブロック化 */
+  font-size: 1.5rem; /* 文字を大きく */
+  line-height: 1.6; /* 行間を広げる */
+  margin-bottom: 40px;
+  color: #000;
+}
+
+.detail-info p {
+  margin: 5px 0;
+}

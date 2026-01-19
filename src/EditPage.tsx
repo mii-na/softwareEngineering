@@ -148,7 +148,7 @@ const EditPage: React.FC = () => {
           </button>
           
           <button className="action-button" onClick={() => navigate('/')}>
-            戻り
+            戻る
           </button>
         </div>
 
