@@ -112,7 +112,7 @@ const Home: React.FC = () => {
             </div>
             <div className="modal-actions">
               <button className="save-button" onClick={() => setIsModalOpen(false)}>
-                戻り
+                戻る
               </button>
             </div>
           </div>
