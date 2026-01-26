@@ -392,3 +392,53 @@ body {
   justify-content: flex-end; /* 右端に寄せる */
   margin-top: 32px;
 }
+
+/* --- 受領（チェックボックス）列のスタイル --- */
+
+/* ヘッダー */
+.th-receive {
+  width: 60px; /* アイコン列と同じくらいの幅 */
+  background-color: #4A86E8;
+  color: white;
+  border-right: 1px solid #666;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem; /* 文字数に合わせて少し小さく調整 */
+}
+
+/* ボディ（セル） */
+.td-receive {
+  width: 60px;
+  text-align: center;
+  padding: 0;
+  border: 1px solid #666;
+  vertical-align: middle;
+}
+
+/* チェックボックス本体を大きくする */
+.receive-checkbox {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  accent-color: #4A86E8; /* チェック時の色をテーマカラーに合わせる */
+}
+
+/* 空行用 */
+.td-receive-empty {
+  border: 1px solid #666;
+}
+
+/* --- 削除・編集列のヘッダースタイル --- */
+.th-action-col {
+  width: 60px; /* アイコン列の幅 */
+  background-color: #4A86E8; /* 青背景 */
+  color: white; /* 白文字 */
+  border-right: 1px solid #666;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}

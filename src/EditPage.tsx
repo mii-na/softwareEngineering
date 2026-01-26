@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 
-
-// --- データ型定義 (Homeと合わせる) ---
-// Home.tsxのParcelDataと同じ構造にします
+// --- データ型定義 ---
 interface ParcelDataCommon {
   id: string;
   studentId?: string;
@@ -13,6 +11,7 @@ interface ParcelDataCommon {
   count: number;
   deliveryDate: string;
   elapsedDays: number;
+  isReceived: boolean;
 }
 
 // --- アイコン ---
@@ -39,27 +38,34 @@ const EditPage: React.FC = () => {
 
   const getTodayDate = () => new Date().toISOString().split('T')[0];
 
-  // --- 初回読み込み ---
   useEffect(() => {
     const savedData = localStorage.getItem('parcelData');
     if (savedData) {
       setItems(JSON.parse(savedData));
     } else {
-      // Homeで初期化されているはずだが念のため
       setItems([]); 
     }
   }, []);
 
-  // --- データを保存する関数 ---
   const saveItems = (newItems: ParcelDataCommon[]) => {
     setItems(newItems);
     localStorage.setItem('parcelData', JSON.stringify(newItems));
   };
 
+  const handleReceive = (id: string) => {
+    const newItems = items.map((item) => {
+      if (item.id === id) {
+        return { ...item, isReceived: !item.isReceived };
+      }
+      return item;
+    });
+    saveItems(newItems);
+  };
+
   const handleDelete = (id: string) => {
-    if (window.confirm('削除しますか？')) {
+    if (window.confirm('完全に削除しますか？')) {
       const newItems = items.filter((item) => item.id !== id);
-      saveItems(newItems); // 保存
+      saveItems(newItems);
     }
   };
 
@@ -74,9 +80,10 @@ const EditPage: React.FC = () => {
       studentId: '',
       studentName: '',
       type: '荷物',
-      count: 1, // デフォルト個数
+      count: 1,
       deliveryDate: getTodayDate(),
-      elapsedDays: 0
+      elapsedDays: 0,
+      isReceived: false
     };
     setEditingItem(newItem);
     setIsModalOpen(true);
@@ -94,18 +101,16 @@ const EditPage: React.FC = () => {
     let newItems = [...items];
 
     if (editingItem.id === '') {
-      // 新規追加
       const newId = Date.now().toString();
       const newItem = { ...editingItem, id: newId };
       newItems.push(newItem);
     } else {
-      // 更新
       newItems = newItems.map((item) => 
         item.id === editingItem.id ? editingItem : item
       );
     }
     
-    saveItems(newItems); // 保存して反映
+    saveItems(newItems);
     setIsModalOpen(false);
   };
 
@@ -123,8 +128,9 @@ const EditPage: React.FC = () => {
           <table className="parcel-table">
             <thead>
               <tr>
-                <th className="th-icon-header"></th>
-                <th className="th-icon-header"></th>
+                <th className="th-receive">受領</th>
+                <th className="th-action-col">削除</th>
+                <th className="th-action-col">編集</th>
                 <th className="th-name">学生名</th>
                 <th className="th-type">種類</th>
                 <th className="th-date">配達日</th>
@@ -134,6 +140,14 @@ const EditPage: React.FC = () => {
             <tbody>
               {items.map((item) => (
                 <tr key={item.id}>
+                  <td className="td-receive">
+                    <input 
+                      type="checkbox" 
+                      className="receive-checkbox"
+                      checked={item.isReceived || false}
+                      onChange={() => handleReceive(item.id)}
+                    />
+                  </td>
                   <td className="td-icon">
                     <div className="icon-box" onClick={() => handleDelete(item.id)} style={{ cursor: 'pointer' }}>
                       <TrashIcon />
@@ -150,10 +164,7 @@ const EditPage: React.FC = () => {
                   <td className="td-center">{item.elapsedDays}</td>
                 </tr>
               ))}
-              <tr className="empty-row">
-                 <td className="td-icon-empty"></td><td className="td-icon-empty"></td>
-                 <td></td><td></td><td></td><td></td>
-              </tr>
+              {/* ここにあった空行 (empty-row) を削除しました */}
             </tbody>
           </table>
         </div>
@@ -170,7 +181,7 @@ const EditPage: React.FC = () => {
 
       </main>
 
-      {/* --- モーダル --- */}
+      {/* モーダル */}
       {isModalOpen && editingItem && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -211,8 +222,6 @@ const EditPage: React.FC = () => {
                 <option value="郵便">郵便</option>
               </select>
             </div>
-            
-            {/* 個数編集が必要な場合はここに追加できますが、今回は指定がなかったため省略 */}
 
             <div className="form-group">
               <label className="form-label">配達日</label>

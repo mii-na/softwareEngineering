@@ -5,46 +5,40 @@ import './App.css';
 // --- データ型定義 ---
 export interface ParcelData {
   id: string;
-  studentId?: string; // EditPageに合わせて追加
+  studentId?: string;
   studentName: string;
   type: '荷物' | '郵便';
   count: number;
   deliveryDate: string;
   elapsedDays: number;
+  isReceived: boolean;
 }
 
-// --- 初期データ（データがない場合に使用） ---
+// --- 初期データ ---
 export const mockData: ParcelData[] = [
-  { id: '1', studentId: '2025001', studentName: '学生A', type: '荷物', count: 1, deliveryDate: '2025-12-15', elapsedDays: 7 },
-  { id: '2', studentId: '2025002', studentName: '学生B', type: '荷物', count: 1, deliveryDate: '2025-12-20', elapsedDays: 2 },
-  { id: '3', studentId: '2025003', studentName: '学生C', type: '荷物', count: 2, deliveryDate: '2025-12-22', elapsedDays: 0 },
-  { id: '4', studentId: '2025004', studentName: '学生Δ', type: '郵便', count: 1, deliveryDate: '2025-12-22', elapsedDays: 0 },
+  { id: '1', studentId: '2025001', studentName: '学生A', type: '荷物', count: 1, deliveryDate: '2025-12-15', elapsedDays: 7, isReceived: false },
+  { id: '2', studentId: '2025002', studentName: '学生B', type: '荷物', count: 1, deliveryDate: '2025-12-20', elapsedDays: 2, isReceived: false },
+  { id: '3', studentId: '2025003', studentName: '学生C', type: '荷物', count: 2, deliveryDate: '2025-12-22', elapsedDays: 0, isReceived: false },
+  { id: '4', studentId: '2025004', studentName: '学生Δ', type: '郵便', count: 1, deliveryDate: '2025-12-22', elapsedDays: 0, isReceived: false },
 ];
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
 
-  // データを管理するState
   const [items, setItems] = useState<ParcelData[]>([]);
-
-  // モーダル制御用の状態
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ParcelData | null>(null);
 
-  // --- 初回読み込み時にlocalStorageからデータを取得 ---
   useEffect(() => {
     const savedData = localStorage.getItem('parcelData');
     if (savedData) {
-      // 保存されたデータがあればそれを使う
       setItems(JSON.parse(savedData));
     } else {
-      // なければ初期データをセットし、localStorageにも保存しておく
       setItems(mockData);
       localStorage.setItem('parcelData', JSON.stringify(mockData));
     }
   }, []);
 
-  // 行をダブルクリックした時の処理
   const handleRowDoubleClick = (item: ParcelData) => {
     setSelectedItem(item);
     setIsModalOpen(true);
@@ -74,17 +68,19 @@ const Home: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {items.map((item) => (
-                <tr 
-                  key={item.id} 
-                  onDoubleClick={() => handleRowDoubleClick(item)}
-                  className="clickable-row"
-                >
-                  <td className="td-name">{item.studentName}</td>
-                  <td className="td-center">{item.type}</td>
-                  <td className="td-center">{item.deliveryDate}</td>
-                  <td className="td-center">{item.elapsedDays}</td>
-                </tr>
+              {items
+                .filter((item) => !item.isReceived)
+                .map((item) => (
+                  <tr 
+                    key={item.id} 
+                    onDoubleClick={() => handleRowDoubleClick(item)}
+                    className="clickable-row"
+                  >
+                    <td className="td-name">{item.studentName}</td>
+                    <td className="td-center">{item.type}</td>
+                    <td className="td-center">{item.deliveryDate}</td>
+                    <td className="td-center">{item.elapsedDays}</td>
+                  </tr>
               ))}
               <tr className="empty-row">
                  <td></td><td></td><td></td><td></td>
@@ -100,7 +96,7 @@ const Home: React.FC = () => {
         </div>
       </main>
 
-      {/* --- 詳細表示モーダル --- */}
+      {/* 詳細モーダル */}
       {isModalOpen && selectedItem && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="modal-content detail-modal" onClick={(e) => e.stopPropagation()}>
@@ -111,6 +107,7 @@ const Home: React.FC = () => {
               <p>配達日 : {selectedItem.deliveryDate}</p>
             </div>
             <div className="modal-actions">
+              {/* ▼ここを変更しました */}
               <button className="save-button" onClick={() => setIsModalOpen(false)}>
                 戻る
               </button>
